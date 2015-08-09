@@ -26,6 +26,8 @@ public class MainActivity extends Activity {
     private ImageView imageView;
     private Button button;
 
+    //コメント
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
