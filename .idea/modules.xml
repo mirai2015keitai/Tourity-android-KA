@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Post screen.iml" filepath="$PROJECT_DIR$/Post screen.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Tourity-android.iml" filepath="$PROJECT_DIR$/Tourity-android.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
