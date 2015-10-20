@@ -37,6 +37,7 @@ public class MainActivity extends Activity{
     private Button button;
 
     //テストコメントです！！
+    //マキノコメントです
     //コメント
     //コメント２
 
