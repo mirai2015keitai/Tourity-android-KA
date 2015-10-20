@@ -36,6 +36,7 @@ public class MainActivity extends Activity{
     private ImageView imageView;
     private Button button;
 
+    //check
     //テストコメントです!
 
     @Override
