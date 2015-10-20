@@ -36,10 +36,8 @@ public class MainActivity extends Activity{
     private ImageView imageView;
     private Button button;
 
-    //テストコメントです！！
-    //マキノコメントです
-    //コメント
-    //コメント２
+    //check
+    //テストコメントです!
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
