@@ -16,7 +16,7 @@ import java.util.Map;
  * Created by karin on 2015/10/19.
  */
 
-public class Post {
+public class Post extends MainActivity{
     RequestQueue mQueue;
 
 
@@ -40,13 +40,15 @@ public class Post {
 
             Map<String, String> params = new HashMap<String, String>();
 
-            params.put("name", "MakinoTakashi");
-            params.put("age", "21");
+            params.put("user_id", "00001");     //ユーザID
+            params.put("message", "???");       //メッセージ
+            params.put("image_path", "???");    //画像パス
+            params.put("latitude", "???");      //緯度
+            params.put("longitude", "???");     //経度
 
             return params;
 
-            //ここではnameというキー値に対してMakinoTakashiを
-            //　　　　ageというキー値に対して21を送っている．
+            //???はまだ決まっていない
         }
         Context sContext;
         void send(){
