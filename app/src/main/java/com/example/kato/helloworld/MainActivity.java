@@ -1,35 +1,21 @@
 package com.example.kato.helloworld;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.net.Uri;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.provider.MediaStore;
-import android.text.SpannableStringBuilder;
-import android.text.TextWatcher;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 public class MainActivity extends Activity {
 //implements LocationListener
@@ -56,12 +42,6 @@ public class MainActivity extends Activity {
                         android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(intent, RESULT_PICK_IMAGEFILE);
 
-                // KitKat以降は使えない
-//                Intent intent = new Intent();
-//                intent.setType("image/*");
-//                intent.setAction(Intent.ACTION_GET_CONTENT);
-//                startActivityForResult(intent, RESULT_PICK_IMAGEFILE);
-
             }
         });
 
@@ -85,6 +65,9 @@ public class MainActivity extends Activity {
 
             }
         });
+
+        //String s = editText.toString();
+
 
     }
 
