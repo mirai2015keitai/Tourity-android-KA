@@ -13,6 +13,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -30,8 +31,8 @@ import android.provider.MediaStore;
 import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 
-public class MainActivity extends Activity{
-// implements LocationListener
+public class MainActivity extends Activity {
+//implements LocationListener
     private static final int RESULT_PICK_IMAGEFILE = 1001;
     private ImageView imageView;
     private Button button;
@@ -64,19 +65,6 @@ public class MainActivity extends Activity{
             }
         });
 
-        /*setContentView(R.layout.activity_main);
-        EditText editText = (EditText) findViewById(R.id.editText);
-        editText.setHeight(50);
-
-        //SpannableStringBuilder sb = (SpannableStringBuilder)edit.getText();
-        String str = editText.getText().toString();
-
-        setContentView(R.layout.activity_main);
-
-        TextView textView = (TextView) findViewById(R.id.textView);
-        textView.setText(str);
-        */
-
 
         EditText editText = (EditText) findViewById(R.id.editText);
         editText.addTextChangedListener(new TextWatcher() {
@@ -97,8 +85,12 @@ public class MainActivity extends Activity{
 
             }
         });
+
     }
-        /*super.onCreate(savedInstanceState);
+
+/*
+        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
 
@@ -110,10 +102,10 @@ public class MainActivity extends Activity{
         Criteria criteria = new Criteria();
 
         // Accuracyを指定(低精度)
-        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+        //criteria.setAccuracy(Criteria.ACCURACY_COARSE);
 
         // PowerRequirementを指定(低消費電力)
-        criteria.setPowerRequirement(Criteria.POWER_LOW);
+        //criteria.setPowerRequirement(Criteria.POWER_LOW);
 
         // ロケーションプロバイダの取得
         String provider = mLocationManager.getBestProvider(criteria, true);
@@ -127,35 +119,36 @@ public class MainActivity extends Activity{
 
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-        // 緯度の表示
-        TextView tv_lat = (TextView) findViewById(R.id.Latitude);
-        tv_lat.setText("緯度:"+location.getLatitude());
+        //@Override
+        public void onLocationChanged(Location location) {
+            // 緯度の表示
+            TextView tv_lat = (TextView) findViewById(R.id.Latitude);
+            tv_lat.setText("緯度:" + location.getLatitude());
 
-        // 経度の表示
-        TextView tv_lng = (TextView) findViewById(R.id.Longitude);
-        tv_lng.setText("経度:"+location.getLongitude());
+            // 経度の表示
+            TextView tv_lng = (TextView) findViewById(R.id.Longitude);
+            tv_lng.setText("経度:" + location.getLongitude());
 
-    }
+        }
 
-    @Override
-    public void onProviderDisabled(String provider) {
-        // TODO Auto-generated method stub
+        //@Override
+        public void onProviderDisabled(String provider) {
+            // TODO Auto-generated method stub
 
-    }
+        }
 
-    @Override
-    public void onProviderEnabled(String provider) {
-        // TODO Auto-generated method stub
+        //@Override
+        public void onProviderEnabled(String provider) {
+            // TODO Auto-generated method stub
 
-    }
+        }
 
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        // TODO Auto-generated method stub
+        //@Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            // TODO Auto-generated method stub
 
-    }
+        }
+
 */
 
 
@@ -178,7 +171,8 @@ public class MainActivity extends Activity{
                 input = getContentResolver().openInputStream(selectedImageURI);
                 bmp = BitmapFactory.decodeStream(input, null, options);
 
-            } catch (FileNotFoundException e) {
+            }
+            catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
 
