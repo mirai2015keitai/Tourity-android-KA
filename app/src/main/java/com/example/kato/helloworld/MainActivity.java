@@ -1,9 +1,14 @@
 package com.example.kato.helloworld;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -17,8 +22,8 @@ import android.widget.TextView;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
-public class MainActivity extends Activity {
-//implements LocationListener
+public class MainActivity extends Activity implements LocationListener {
+//
     private static final int RESULT_PICK_IMAGEFILE = 1001;
     private ImageView imageView;
     private Button button;
@@ -68,10 +73,6 @@ public class MainActivity extends Activity {
 
         //String s = editText.toString();
 
-
-    }
-
-/*
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
@@ -102,35 +103,39 @@ public class MainActivity extends Activity {
 
     }
 
-        //@Override
-        public void onLocationChanged(Location location) {
-            // 緯度の表示
-            TextView tv_lat = (TextView) findViewById(R.id.Latitude);
-            tv_lat.setText("緯度:" + location.getLatitude());
+    //@Override
+    public void onLocationChanged(Location location) {
+        // 緯度の表示
+        TextView tv_lat = (TextView) findViewById(R.id.Latitude);
+        tv_lat.setText("緯度:" + location.getLatitude());
 
-            // 経度の表示
-            TextView tv_lng = (TextView) findViewById(R.id.Longitude);
-            tv_lng.setText("経度:" + location.getLongitude());
+        // 経度の表示
+        TextView tv_lng = (TextView) findViewById(R.id.Longitude);
+        tv_lng.setText("経度:" + location.getLongitude());
 
-        }
+    }
 
-        //@Override
-        public void onProviderDisabled(String provider) {
-            // TODO Auto-generated method stub
+    //@Override
+    public void onProviderDisabled(String provider) {
+        // TODO Auto-generated method stub
 
-        }
+    }
 
-        //@Override
-        public void onProviderEnabled(String provider) {
-            // TODO Auto-generated method stub
+    //@Override
+    public void onProviderEnabled(String provider) {
+        // TODO Auto-generated method stub
 
-        }
+    }
 
-        //@Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            // TODO Auto-generated method stub
+    //@Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        // TODO Auto-generated method stub
 
-        }
+    }
+
+
+/*
+
 
 */
 
