@@ -158,12 +158,12 @@ public class MainActivity extends Activity implements LocationListener {
         latitude = location.getLatitude();
         longitude = location.getLongitude();
 
-        TextView tv_lat = (TextView) findViewById(R.id.Latitude);
+/*        TextView tv_lat = (TextView) findViewById(R.id.Latitude);
         tv_lat.setText("緯度:" + latitude);
 
         TextView tv_lng = (TextView) findViewById(R.id.Longitude);
         tv_lng.setText("経度:" + longitude);
-    }
+*/    }
 
     @Override
     public void onProviderDisabled(String provider) {
