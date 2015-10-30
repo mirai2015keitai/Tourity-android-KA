@@ -1,7 +1,9 @@
 package com.example.kato.helloworld;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -65,6 +67,7 @@ public class MainActivity extends Activity implements LocationListener {
             }
         });
 
+
         EditText editText = (EditText) findViewById(R.id.editText);
 
         editText.addTextChangedListener(new TextWatcher() {
@@ -87,6 +90,8 @@ public class MainActivity extends Activity implements LocationListener {
             }
         });
 
+
+
         // LocationManagerを取得
         LocationManager mLocationManager =
                 (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -108,17 +113,44 @@ public class MainActivity extends Activity implements LocationListener {
         //tv_provider.setText("Provider: "+provider);
 
         // LocationListenerを登録
-        mLocationManager.requestLocationUpdates(provider, 0, 0, this);
+        mLocationManager.requestLocationUpdates(provider, 0, 0, this);}
 
-        //投稿
-        button2 = (Button) findViewById(R.id.button2);
-        button2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        //投稿ボタン
+        public void alertDialogShow(View v){
+
+            //AlertDialog.Builderクラスのインスタンスを生成
+
+            AlertDialog.Builder alertDialogBuilder=new AlertDialog.Builder(this);
+
+            //タイトルを設定
+            alertDialogBuilder.setTitle("エラー")
+
+            //メッセージを設定
+            .setMessage("テキストが未入力です")
+
+            //アイコンを設定
+            //.setIcon(R.drawable.ic_launcher)
+
+            //Positiveボタン、リスナーを設定
+            .setPositiveButton("OK",new DialogInterface.OnClickListener(){
+                    public void onClick(DialogInterface dialog,int which){
+                    //OKボタンが押されたときの処理
+                    //varTextView.setText("OKボタンがクリックされました");
+                    }
+            });
+
+            //投稿文が空の場合ダイアログ表示
+            if(messa == null || messa.length() == 0) {
+                //ダイアログを表示
+                alertDialogBuilder.show();
+            }
+
+            //サーバへ送信
+            else{
                 Post();
             }
-        });
-    }
+        }
+
 
     //緯度経度取得
     @Override
