@@ -45,9 +45,6 @@ public class MainActivity extends Activity implements LocationListener {
 
     String messa,img;
 
-    //テストコメントです!
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -158,6 +155,7 @@ public class MainActivity extends Activity implements LocationListener {
         latitude = location.getLatitude();
         longitude = location.getLongitude();
 
+        //緯度経度を画面上に表示
 /*        TextView tv_lat = (TextView) findViewById(R.id.Latitude);
         tv_lat.setText("緯度:" + latitude);
 
