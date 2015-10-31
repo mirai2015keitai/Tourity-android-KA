@@ -142,7 +142,7 @@ public class MainActivity extends Activity implements LocationListener {
                 alertDialogBuilder.show();
             }
 
-            //サーバへ送信
+            //Postでサーバへ送信
             else{
                 Post();
             }
