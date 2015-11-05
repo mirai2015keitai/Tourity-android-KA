@@ -142,7 +142,7 @@ public class MainActivity extends Activity implements LocationListener {
                 alertDialogBuilder.show();
             }
 
-            //サーバへ送信
+            //Postでサーバへ送信
             else{
                 Post();
             }
@@ -181,7 +181,7 @@ public class MainActivity extends Activity implements LocationListener {
 
     }
 
-        // アプリからギャラリーにアクセスして、画像と画像情報を取得 からの戻り
+    // アプリからギャラリーにアクセスして、画像と画像情報を取得 からの戻り
 
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
