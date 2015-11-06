@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -220,6 +221,10 @@ public class MainActivity extends Activity implements LocationListener {
 
     //Volleyによるサーバへの送信
     private void Post(){
+
+        //確認のためのトースト
+        Toast.makeText(getApplicationContext(),"POST完了",Toast.LENGTH_LONG).show();
+
         RequestQueue mQueue = Volley.newRequestQueue(getApplicationContext());
 
 
