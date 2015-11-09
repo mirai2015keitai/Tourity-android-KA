@@ -228,8 +228,8 @@ public class MainActivity extends Activity implements LocationListener {
         RequestQueue mQueue = Volley.newRequestQueue(getApplicationContext());
 
 
-        String url = "ここにURL";
-//        String url = "http://tourityplus-android.ddns.net/postMessage";
+//        String url = "ここにURL";
+        String url = "http://tourityplus-android.ddns.net/postMessage";
 
         StringRequest request = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
