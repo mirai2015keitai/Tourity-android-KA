@@ -27,10 +27,10 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -228,10 +228,10 @@ public class MainActivity extends Activity implements LocationListener {
         RequestQueue mQueue = Volley.newRequestQueue(getApplicationContext());
 
 
-//        String url = "ここにURL";
-        String url = "http://tourityplus-android.ddns.net/postMessage";
+//        String url = "http://192.168.33.10:1337/postMessage";
+        String url = "http://tourityplus-android.ddns.net:1337/postMessage";
 
-        StringRequest request = new StringRequest(Request.Method.POST, url,
+        StringRequest requesttext = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -248,20 +248,32 @@ public class MainActivity extends Activity implements LocationListener {
                 //HashMapをこの関数内で書くことでサーバにPOSTする（送る）ことができる
 
                 Map<String, String> params = new HashMap<String, String>();
-                Map<String, File> FileMap = new HashMap<String, File>();
+                //Map<String, File> FileMap = new HashMap<String, File>();
 
-                params.put("user_id", "00001");     //仮ユーザID
+                params.put("user_id", "1");     //仮ユーザID
                 params.put("message", messa);       //メッセージ
-                FileMap.put("image_path", new File(img));    //画像パス
+                //FileMap.put("image_path", new File(img));    //画像パス
                 params.put("latitude", String.valueOf(latitude));      //緯度
                 params.put("longitude", String.valueOf(longitude));     //経度
 
                 return params;
             }
-            Context sContext;
-
         };
-        mQueue.add(request);
+        mQueue.add(requesttext);
+
+        ImageRequest requestimage = new ImageRequest(url, new Response.Listener<Bitmap>(){
+            @Override
+            public void onResponse(Bitmap bitmap){
+                imageView.setImageBitmap(bitmap);
+            }
+        }, 0, 0, Bitmap.Config.ARGB_8888, new Response.ErrorListener(){
+            @Override
+            public void onErrorResponse(VolleyError error){
+                Log.d("エラーレスポンス", "error");
+            }
+        });
+        mQueue.add(requestimage);
+        mQueue.start();
 
 
     }
