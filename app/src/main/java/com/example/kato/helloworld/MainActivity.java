@@ -2,6 +2,7 @@ package com.example.kato.helloworld;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,8 +12,11 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -38,20 +42,30 @@ import java.util.Map;
 
 public class MainActivity extends Activity implements LocationListener {
 //
-    private static final int RESULT_PICK_IMAGEFILE = 1001;
-    private ImageView imageView;
-    private Button button, button2;
+    //ギャラリーのみのプログラム
+    //private static final int RESULT_PICK_IMAGEFILE = 1001;
+
+    //ギャラリーのみのプログラム
+    //private ImageView imageView;
+    private Button button2;
+
+    //private Button button;
+
+    //カメラ、ギャラリー
+    private Uri m_uri;
+    private static final int REQUEST_CHOOSER = 1000;
 
     double latitude, longitude;
 
-    String messa,img;
+    String messa, img;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setViews();
 
-        imageView = (ImageView) findViewById(R.id.image_view);
+        /*imageView = (ImageView) findViewById(R.id.image_view);
 
         button = (Button) findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
@@ -62,8 +76,32 @@ public class MainActivity extends Activity implements LocationListener {
                         android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(intent, RESULT_PICK_IMAGEFILE);
 
-            }
-        });
+            /
+        });*/
+
+
+        // LocationManagerを取得
+        LocationManager mLocationManager =
+                (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        // Criteriaオブジェクトを生成
+        Criteria criteria = new Criteria();
+
+        // Accuracyを指定(低精度)
+        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+
+        // PowerRequirementを指定(低消費電力)
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
+
+        // ロケーションプロバイダの取得
+        String provider = mLocationManager.getBestProvider(criteria, true);
+
+        // 取得したロケーションプロバイダを表示
+        //TextView tv_provider = (TextView) findViewById(R.id.Provider);
+        //tv_provider.setText("Provider: "+provider);
+
+        // LocationListenerを登録
+        mLocationManager.requestLocationUpdates(provider, 0, 0, this);
 
 
         EditText editText = (EditText) findViewById(R.id.editText);
@@ -89,31 +127,62 @@ public class MainActivity extends Activity implements LocationListener {
         });
 
 
+    }
 
-        // LocationManagerを取得
-        LocationManager mLocationManager =
-                (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+    private void setViews() {
+        Button button = (Button) findViewById(R.id.button);
+        button.setOnClickListener(button_onClick);
 
-        // Criteriaオブジェクトを生成
-        Criteria criteria = new Criteria();
+    }
 
-        // Accuracyを指定(低精度)
-        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+    private View.OnClickListener button_onClick = new View.OnClickListener() {
 
-        // PowerRequirementを指定(低消費電力)
-        criteria.setPowerRequirement(Criteria.POWER_LOW);
+        @Override
+        public void onClick(View v) {
+            showGallery();
+        }
 
-        // ロケーションプロバイダの取得
-        String provider = mLocationManager.getBestProvider(criteria, true);
+    };
 
-        // 取得したロケーションプロバイダを表示
-        //TextView tv_provider = (TextView) findViewById(R.id.Provider);
-        //tv_provider.setText("Provider: "+provider);
+    private void showGallery() {
 
-        // LocationListenerを登録
-        mLocationManager.requestLocationUpdates(provider, 0, 0, this);}
+        //カメラの起動Intentの用意
+        String photoName = System.currentTimeMillis() + ".jpg";
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MediaStore.Images.Media.TITLE, photoName);
+        contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        m_uri = getContentResolver()
+                .insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
 
-        //投稿ボタン
+        Intent intentCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intentCamera.putExtra(MediaStore.EXTRA_OUTPUT, m_uri);
+
+        // ギャラリー用のIntent作成
+        Intent intentGallery;
+        if (Build.VERSION.SDK_INT < 19) {
+            intentGallery = new Intent(Intent.ACTION_GET_CONTENT);
+            intentGallery.setType("image/*");
+        } else {
+            intentGallery = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intentGallery.addCategory(Intent.CATEGORY_OPENABLE);
+            intentGallery.setType("image/jpeg");
+        }
+        Intent intent = Intent.createChooser(intentCamera, "画像の選択");
+        intent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{intentGallery});
+        startActivityForResult(intent, REQUEST_CHOOSER);
+
+    }
+
+
+
+
+
+
+
+
+
+
+    //投稿ボタン
         public void alertDialogShow(View v){
 
             //AlertDialog.Builderクラスのインスタンスを生成
@@ -182,12 +251,39 @@ public class MainActivity extends Activity implements LocationListener {
 
     }
 
-    // アプリからギャラリーにアクセスして、画像と画像情報を取得 からの戻り
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        super.onActivityResult(requestCode, resultCode, intent);
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
+        if(requestCode == REQUEST_CHOOSER) {
 
+            if(resultCode != RESULT_OK) {
+                // キャンセル時
+                return ;
+            }
+
+            Uri resultUri = (data != null ? data.getData() : m_uri);
+
+            if(resultUri == null) {
+                // 取得失敗
+                return;
+            }
+
+            // ギャラリーへスキャンを促す
+            MediaScannerConnection.scanFile(
+                    this,
+                    new String[]{resultUri.getPath()},
+                    new String[]{"image/jpeg"},
+                    null
+            );
+
+            // 画像を設定
+            ImageView imageView = (ImageView)findViewById(R.id.image_view);
+            imageView.setImageURI(resultUri);
+        }
+
+        /* ギャラリーのみのプログラム
+        // アプリからギャラリーにアクセスして、画像と画像情報を取得 からの戻り
         if (requestCode == RESULT_PICK_IMAGEFILE && resultCode == RESULT_OK && null != intent) {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = false;
@@ -212,7 +308,8 @@ public class MainActivity extends Activity implements LocationListener {
                 imageView.setImageBitmap(bmp);
             }
 
-        }
+        }*/
+
     }
 
 
