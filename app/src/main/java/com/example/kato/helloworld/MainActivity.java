@@ -76,7 +76,7 @@ public class MainActivity extends Activity implements LocationListener {
                         android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(intent, RESULT_PICK_IMAGEFILE);
 
-            /
+            
         });*/
 
 
