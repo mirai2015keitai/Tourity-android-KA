@@ -4,14 +4,14 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="widthsize1">300dp</dimen>
-    <dimen name="widthsize2">210dp</dimen>
+    <dimen name="widthsize2">180dp</dimen>
     <dimen name="widthsize3">70dp</dimen>
-    <dimen name="widthsize4">160dp</dimen>
+    <dimen name="widthsize4">140dp</dimen>
 
     <dimen name="heightsize1">180dp</dimen>
-    <dimen name="heightsize2">210dp</dimen>
+    <dimen name="heightsize2">180dp</dimen>
     <dimen name="heightsize3">70dp</dimen>
-    <dimen name="heightsize4">100dp</dimen>
+    <dimen name="heightsize4">70dp</dimen>
 
     <dimen name="weightsize1">0.18dp</dimen>
     <dimen name="weightsize2">48dp</dimen>
@@ -19,5 +19,9 @@
     <dimen name="marginsize1">34dp</dimen>
     <dimen name="marginsize2">37dp</dimen>
     <dimen name="marginsize3">19dp</dimen>
+    <dimen name="marginsize4">20dp</dimen>
+    <dimen name="marginsize5">55dp</dimen>
+    <dimen name="marginsize6">30dp</dimen>
+    <dimen name="marginsize7">10dp</dimen>
 
 </resources>
