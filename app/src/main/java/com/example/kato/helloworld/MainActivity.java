@@ -1,13 +1,9 @@
 package com.example.kato.helloworld;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -27,27 +23,27 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import java.io.FileNotFoundException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends Activity implements LocationListener {
-//
+public class MainActivity extends Activity implements LocationListener{
+
     //ギャラリーのみのプログラム
     //private static final int RESULT_PICK_IMAGEFILE = 1001;
 
     //ギャラリーのみのプログラム
-    //private ImageView imageView;
+    private ImageView imageView;
     private Button button2;
+    InputStream is = null;
 
     //private Button button;
 
@@ -57,28 +53,21 @@ public class MainActivity extends Activity implements LocationListener {
 
     double latitude, longitude;
 
-    String messa, img;
+    private String message;
+    private Uri resultUri;
+
+
+    //private RequestQueue mQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setViews();
+        setPOST();
 
-        /*imageView = (ImageView) findViewById(R.id.image_view);
-
-        button = (Button) findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // ギャラリー呼び出し
-                Intent intent = new Intent(Intent.ACTION_PICK,
-                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intent, RESULT_PICK_IMAGEFILE);
-
-            
-        });*/
-
+//緯度経度取得の準備
+//--------------------------------------------------------------------------------------------------
 
         // LocationManagerを取得
         LocationManager mLocationManager =
@@ -103,6 +92,8 @@ public class MainActivity extends Activity implements LocationListener {
         // LocationListenerを登録
         mLocationManager.requestLocationUpdates(provider, 0, 0, this);
 
+//プレビューのための入力文章取得
+//--------------------------------------------------------------------------------------------------
 
         EditText editText = (EditText) findViewById(R.id.editText);
 
@@ -121,13 +112,14 @@ public class MainActivity extends Activity implements LocationListener {
             public void afterTextChanged(Editable s) {
                 TextView textView = (TextView) findViewById(R.id.textView);
                 textView.setText(s.toString());
-                messa = s.toString();
+                message = s.toString();
 
             }
         });
-
-
     }
+
+//画像取得
+//--------------------------------------------------------------------------------------------------
 
     private void setViews() {
         Button button = (Button) findViewById(R.id.button);
@@ -173,65 +165,70 @@ public class MainActivity extends Activity implements LocationListener {
 
     }
 
+//投稿ボタン
+//--------------------------------------------------------------------------------------------------
+
+//    public void alertDialogShow(View v) {
+//
+//        //AlertDialog.Builderクラスのインスタンスを生成
+//
+//        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+//
+//        //タイトルを設定
+//        alertDialogBuilder.setTitle("エラー")
+//
+//                //メッセージを設定
+//                .setMessage("テキストが未入力です")
+//
+//                        //アイコンを設定
+//                        //.setIcon(R.drawable.ic_launcher)
+//
+//                        //Positiveボタン、リスナーを設定
+//                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        //OKボタンが押されたときの処理
+//                        //varTextView.setText("OKボタンがクリックされました");
+//                    }
+//                });
+//
+//        //投稿文が空 -> ダイアログ表示
+//        if (message == null || message.length() == 0) {
+//            //ダイアログを表示
+//            alertDialogBuilder.show();
+//        }
+//
+//        //投稿文あり -> サーバへ送信
+//        else {
+//            Toast.makeText(getApplicationContext(), "POST完了", Toast.LENGTH_LONG).show();
+//            Post();
+//        }
+//    }
+
+    private void setPOST() {
+        Button button = (Button) findViewById(R.id.button2);
+        button.setOnClickListener(button2_onClick);
+
+    }
+    private View.OnClickListener button2_onClick = new View.OnClickListener() {
+
+        @Override
+        public void onClick(View v) {
+            Toast.makeText(getApplicationContext(), "POST完了1", Toast.LENGTH_LONG).show();
 
 
-
-
-
-
-
-
-
-    //投稿ボタン
-        public void alertDialogShow(View v){
-
-            //AlertDialog.Builderクラスのインスタンスを生成
-
-            AlertDialog.Builder alertDialogBuilder=new AlertDialog.Builder(this);
-
-            //タイトルを設定
-            alertDialogBuilder.setTitle("エラー")
-
-            //メッセージを設定
-            .setMessage("テキストが未入力です")
-
-            //アイコンを設定
-            //.setIcon(R.drawable.ic_launcher)
-
-            //Positiveボタン、リスナーを設定
-            .setPositiveButton("OK",new DialogInterface.OnClickListener(){
-                    public void onClick(DialogInterface dialog,int which){
-                    //OKボタンが押されたときの処理
-                    //varTextView.setText("OKボタンがクリックされました");
-                    }
-            });
-
-            //投稿文が空の場合ダイアログ表示
-            if(messa == null || messa.length() == 0) {
-                //ダイアログを表示
-                alertDialogBuilder.show();
-            }
-
-            //Postでサーバへ送信
-            else{
-                Post();
-            }
+            Post();
         }
 
+    };
 
-    //緯度経度取得
+//緯度経度取得
+//--------------------------------------------------------------------------------------------------
+
     @Override
     public void onLocationChanged(Location location) {
         latitude = location.getLatitude();
         longitude = location.getLongitude();
-
-        //緯度経度を画面上に表示
-/*        TextView tv_lat = (TextView) findViewById(R.id.Latitude);
-        tv_lat.setText("緯度:" + latitude);
-
-        TextView tv_lng = (TextView) findViewById(R.id.Longitude);
-        tv_lng.setText("経度:" + longitude);
-*/    }
+    }
 
     @Override
     public void onProviderDisabled(String provider) {
@@ -251,6 +248,8 @@ public class MainActivity extends Activity implements LocationListener {
 
     }
 
+//画像取得
+//--------------------------------------------------------------------------------------------------
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -262,7 +261,7 @@ public class MainActivity extends Activity implements LocationListener {
                 return ;
             }
 
-            Uri resultUri = (data != null ? data.getData() : m_uri);
+            resultUri = (data != null ? data.getData() : m_uri);
 
             if(resultUri == null) {
                 // 取得失敗
@@ -278,103 +277,68 @@ public class MainActivity extends Activity implements LocationListener {
             );
 
             // 画像を設定
-            ImageView imageView = (ImageView)findViewById(R.id.image_view);
+            imageView = (ImageView)findViewById(R.id.image_view);
             imageView.setImageURI(resultUri);
+            //uri→→inputstream サーバのプログラムで使用
+            try {
+                is = new FileInputStream(new File(resultUri.getPath()));
+                }catch(IOException e){}
+
         }
 
-        /* ギャラリーのみのプログラム
-        // アプリからギャラリーにアクセスして、画像と画像情報を取得 からの戻り
-        if (requestCode == RESULT_PICK_IMAGEFILE && resultCode == RESULT_OK && null != intent) {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = false;
-            Bitmap bmp = null;
-            Uri selectedImageURI = intent.getData();
-
-            getImageDataPath(selectedImageURI);
-
-            img = String.valueOf(selectedImageURI);
-
-            InputStream input = null;
-            try {
-                input = getContentResolver().openInputStream(selectedImageURI);
-                bmp = BitmapFactory.decodeStream(input, null, options);
-
-            }
-            catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-
-            if (bmp != null) {
-                imageView.setImageBitmap(bmp);
-            }
-
-        }*/
-
     }
 
+//サーバとの通信
+//--------------------------------------------------------------------------------------------------
 
-    private void getImageDataPath(Uri selectedImageURI) {
-    }
-
-    //Volleyによるサーバへの送信
     private void Post(){
 
         //確認のためのトースト
-        Toast.makeText(getApplicationContext(),"POST完了",Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "POST完了", Toast.LENGTH_LONG).show();
 
         RequestQueue mQueue = Volley.newRequestQueue(getApplicationContext());
 
 
-//        String url = "http://192.168.33.10:1337/postMessage";
-        String url = "http://tourityplus-android.ddns.net:1337/postMessage";
+        String url = "http://192.168.33.10:1337/postMessage";
+//        String url = "http://tourityplus-android.ddns.net:1337/postMessage";
 
-        StringRequest requesttext = new StringRequest(Request.Method.POST, url,
+        Map<String,String> stringMap = new HashMap<String, String>();
+        Map<String,File> fileMap = new HashMap<String, File>();
+
+        //送るデータを設定
+        //stringMap.put("text", "hogege"); //textも送るとき利用
+        //fileMap.put("img", new File("/file/hoge.jpg"));
+        stringMap.put("user_id", "1");     //仮ユーザID
+        //stringMap.put("message", message);       //メッセージ
+        fileMap.put("image_path", new File(resultUri.getPath()));    //画像パス
+        //stringMap.put("latitude", String.valueOf(latitude));      //緯度
+        //stringMap.put("longitude", String.valueOf(longitude));     //経度
+
+        //user_id中身確認用
+        Log.d("stringMap",stringMap.get("user_id"));
+
+        MultipartRequest multipartRequest = new MultipartRequest(
+                url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        //Upload成功
                         Log.d("レスポンス", response);//ここのString型のresponseにサーバからのレスポンスが入る
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d("エラーレスポンス", "error");
+                        //Upload失敗
+                        Log.d("エラーレスポンス", "error1");
                     }
-                }) {
-            protected Map<String, String> getParams() {
-                //HashMapをこの関数内で書くことでサーバにPOSTする（送る）ことができる
-
-                Map<String, String> params = new HashMap<String, String>();
-                //Map<String, File> FileMap = new HashMap<String, File>();
-
-                params.put("user_id", "1");     //仮ユーザID
-                params.put("message", messa);       //メッセージ
-                //FileMap.put("image_path", new File(img));    //画像パス
-                params.put("latitude", String.valueOf(latitude));      //緯度
-                params.put("longitude", String.valueOf(longitude));     //経度
-
-                return params;
-            }
-        };
-        mQueue.add(requesttext);
-
-        ImageRequest requestimage = new ImageRequest(url, new Response.Listener<Bitmap>(){
-            @Override
-            public void onResponse(Bitmap bitmap){
-                imageView.setImageBitmap(bitmap);
-            }
-        }, 0, 0, Bitmap.Config.ARGB_8888, new Response.ErrorListener(){
-            @Override
-            public void onErrorResponse(VolleyError error){
-                Log.d("エラーレスポンス", "error");
-            }
-        });
-        mQueue.add(requestimage);
+                },
+                stringMap,
+                fileMap);
+        mQueue.add(multipartRequest);
         mQueue.start();
 
-
     }
-
 }
 
 
