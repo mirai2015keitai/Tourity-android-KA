@@ -21,7 +21,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -213,8 +212,6 @@ public class MainActivity extends Activity implements LocationListener{
 
         @Override
         public void onClick(View v) {
-            Toast.makeText(getApplicationContext(), "POST完了1", Toast.LENGTH_LONG).show();
-
 
             Post();
         }
@@ -293,9 +290,6 @@ public class MainActivity extends Activity implements LocationListener{
 
     private void Post(){
 
-        //確認のためのトースト
-        Toast.makeText(getApplicationContext(), "POST完了", Toast.LENGTH_LONG).show();
-
         RequestQueue mQueue = Volley.newRequestQueue(getApplicationContext());
 
 
@@ -309,13 +303,14 @@ public class MainActivity extends Activity implements LocationListener{
         //stringMap.put("text", "hogege"); //textも送るとき利用
         //fileMap.put("img", new File("/file/hoge.jpg"));
         stringMap.put("user_id", "1");     //仮ユーザID
-        //stringMap.put("message", message);       //メッセージ
+        stringMap.put("message", message);       //メッセージ
         fileMap.put("image_path", new File(resultUri.getPath()));    //画像パス
-        //stringMap.put("latitude", String.valueOf(latitude));      //緯度
-        //stringMap.put("longitude", String.valueOf(longitude));     //経度
+        stringMap.put("latitude", String.valueOf(latitude));      //緯度
+        stringMap.put("longitude", String.valueOf(longitude));     //経度
 
         //user_id中身確認用
         Log.d("stringMap",stringMap.get("user_id"));
+        Log.d("stringMap",stringMap.get("message"));
 
         MultipartRequest multipartRequest = new MultipartRequest(
                 url,
@@ -335,8 +330,9 @@ public class MainActivity extends Activity implements LocationListener{
                 },
                 stringMap,
                 fileMap);
+
         mQueue.add(multipartRequest);
-        mQueue.start();
+        //mQueue.start();
 
     }
 }

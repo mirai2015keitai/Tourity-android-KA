@@ -1,5 +1,7 @@
 package com.example.kato.helloworld;
 
+import android.util.Log;
+
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -16,9 +18,9 @@ public class MultipartRequest extends Request<String> {
 
     MultipartEntityBuilder entity = MultipartEntityBuilder.create();
     HttpEntity httpEntitiy;
-    private final Response.Listener<String> mListener;
-    private final Map<String, String> mStringParts;
-    private final Map<String, File> mFileParts;
+    private Response.Listener<String> mListener;
+    private Map<String, String> mStringParts;
+    private Map<String, File> mFileParts;
 
     public MultipartRequest(String url, Response.Listener<String> listener,
                             Response.ErrorListener errorListener,
@@ -37,8 +39,13 @@ public class MultipartRequest extends Request<String> {
         //StringData
         for (Map.Entry<String, String> entry : mStringParts.entrySet()) {
             entity.addTextBody(entry.getKey(), entry.getValue());
+            //確認用
+            Log.d("",this.entity.toString().toString());
 
         }
+
+
+
         //File Data
         for (Map.Entry<String, File> entry : mFileParts.entrySet()) {
             entity.addPart(entry.getKey(), new FileBody(entry.getValue()));
