@@ -22,19 +22,21 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.NetworkResponse;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.Volley;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.UnsupportedEncodingException;
+import java.util.LinkedHashMap;
 
-public class MainActivity extends Activity implements LocationListener{
+public class MainActivity extends Activity implements LocationListener {
 
     //ギャラリーのみのプログラム
     //private static final int RESULT_PICK_IMAGEFILE = 1001;
@@ -208,6 +210,7 @@ public class MainActivity extends Activity implements LocationListener{
         button.setOnClickListener(button2_onClick);
 
     }
+
     private View.OnClickListener button2_onClick = new View.OnClickListener() {
 
         @Override
@@ -251,16 +254,16 @@ public class MainActivity extends Activity implements LocationListener{
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == REQUEST_CHOOSER) {
+        if (requestCode == REQUEST_CHOOSER) {
 
-            if(resultCode != RESULT_OK) {
+            if (resultCode != RESULT_OK) {
                 // キャンセル時
-                return ;
+                return;
             }
 
             resultUri = (data != null ? data.getData() : m_uri);
 
-            if(resultUri == null) {
+            if (resultUri == null) {
                 // 取得失敗
                 return;
             }
@@ -274,12 +277,13 @@ public class MainActivity extends Activity implements LocationListener{
             );
 
             // 画像を設定
-            imageView = (ImageView)findViewById(R.id.image_view);
+            imageView = (ImageView) findViewById(R.id.image_view);
             imageView.setImageURI(resultUri);
             //uri→→inputstream サーバのプログラムで使用
             try {
                 is = new FileInputStream(new File(resultUri.getPath()));
-                }catch(IOException e){}
+            } catch (IOException e) {
+            }
 
         }
 
@@ -288,16 +292,82 @@ public class MainActivity extends Activity implements LocationListener{
 //サーバとの通信
 //--------------------------------------------------------------------------------------------------
 
-    private void Post(){
+//    private void Post(){
+//
+////        RequestQueue mQueue = Volley.newRequestQueue(getApplicationContext());
+//
+//
+//        String url = "http://192.168.33.10:1337/postMessage";
+////        String url = "http://tourityplus-android.ddns.net:1337/postMessage";
+//
+//        Map<String,String> stringMap = new HashMap<String, String>();
+//        Map<String,File> fileMap = new HashMap<String, File>();
+//
+//        //送るデータを設定
+//        //stringMap.put("text", "hogege"); //textも送るとき利用
+//        //fileMap.put("img", new File("/file/hoge.jpg"));
+//        stringMap.put("user_id", "1");     //仮ユーザID
+//        stringMap.put("message", message);       //メッセージ
+//        fileMap.put("image_path", new File(resultUri.getPath()));    //画像パス
+//        stringMap.put("latitude", String.valueOf(latitude));      //緯度
+//        stringMap.put("longitude", String.valueOf(longitude));     //経度
+//
+//        //user_id中身確認用
+//        Log.d("stringMap",stringMap.get("user_id"));
+//        Log.d("stringMap",stringMap.get("message"));
+//
+//        MultipartRequest multipartRequest = new MultipartRequest(
+//                url,
+//                new Response.Listener<String>() {
+//                    @Override
+//                    public void onResponse(String response) {
+//                        //Upload成功
+//                        Log.d("レスポンス", response);//ここのString型のresponseにサーバからのレスポンスが入る
+//                    }
+//                },
+//                new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        //Upload失敗
+//                        Log.d("エラーレスポンス", "error1");
+//                    }
+//                },
+//                stringMap,
+//                fileMap);
+//
+//        //Log.d("",MultipartRequest.getentity());
+//
+//        RequestQueue mQueue = Volley.newRequestQueue(this.getApplicationContext());
+//        mQueue.add(multipartRequest);
+//        //mQueue.start();
+//
+//    }
 
-        RequestQueue mQueue = Volley.newRequestQueue(getApplicationContext());
+//サーバとの通信2
+//--------------------------------------------------------------------------------------------------
 
+    private void Post() {
+        Response.Listener<String> listener = new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                // リクエスト成功時
+                Log.d("レスポンス", response);//ここのString型のresponseにサーバからのレスポンスが入る
+            }
+        };
+
+        Response.ErrorListener errorListener = new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // リクエスト失敗時
+                Log.d("エラーレスポンス", "error1");
+            }
+        };
 
         String url = "http://192.168.33.10:1337/postMessage";
 //        String url = "http://tourityplus-android.ddns.net:1337/postMessage";
 
-        Map<String,String> stringMap = new HashMap<String, String>();
-        Map<String,File> fileMap = new HashMap<String, File>();
+        LinkedHashMap<String,String> stringMap = new LinkedHashMap<String, String>();
+        LinkedHashMap<String,File> fileMap = new LinkedHashMap<String, File>();
 
         //送るデータを設定
         //stringMap.put("text", "hogege"); //textも送るとき利用
@@ -308,33 +378,23 @@ public class MainActivity extends Activity implements LocationListener{
         stringMap.put("latitude", String.valueOf(latitude));      //緯度
         stringMap.put("longitude", String.valueOf(longitude));     //経度
 
-        //user_id中身確認用
-        Log.d("stringMap",stringMap.get("user_id"));
-        Log.d("stringMap",stringMap.get("message"));
+        MultipartRequest<String> multipartRequest = new MultipartRequest<String>(url, stringMap, fileMap, listener, errorListener) {
+            @Override
+            protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                String parsed;
+                try {
+                    parsed = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+                } catch (UnsupportedEncodingException e) {
+                    parsed = new String(response.data);
+                }
+                return Response.success(parsed, HttpHeaderParser.parseCacheHeaders(response));
+            }
+        };
 
-        MultipartRequest multipartRequest = new MultipartRequest(
-                url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        //Upload成功
-                        Log.d("レスポンス", response);//ここのString型のresponseにサーバからのレスポンスが入る
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //Upload失敗
-                        Log.d("エラーレスポンス", "error1");
-                    }
-                },
-                stringMap,
-                fileMap);
-
-        mQueue.add(multipartRequest);
-        //mQueue.start();
+        RequestQueue requestQueue = Volley.newRequestQueue(this.getApplicationContext());
+        requestQueue.add(multipartRequest);
+        requestQueue.start();
 
     }
+
 }
-
-
