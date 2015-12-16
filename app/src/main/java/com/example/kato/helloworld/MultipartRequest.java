@@ -1,78 +1,95 @@
 package com.example.kato.helloworld;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 
-import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
-import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.LinkedHashMap;
+import java.util.Map;
 
-public abstract class MultipartRequest<T> extends Request<T> {
+public class MultipartRequest extends Request<String> {
 
-    private final MultipartEntityBuilder mMultipartEntityBuilder = MultipartEntityBuilder.create();
+    MultipartEntityBuilder entity = MultipartEntityBuilder.create();
+    HttpEntity httpEntitiy;
+    private final Response.Listener<String> mListener;
+    private final Map<String, String> mStringParts;
+    private final Map<String, File> mFileParts;
 
-
-    //コンテンツ設定に必要なデーターを格納
-    public HttpEntity mHttpEntity;
-
-    public MultipartRequest(@NonNull String url, @Nullable LinkedHashMap<String, String> requestStringBody, @Nullable LinkedHashMap<String, File> requestFileBody, @NonNull Response.Listener<T> listener, @NonNull Response.ErrorListener errorListener) {
+    public MultipartRequest(String url, Response.Listener<String> listener,
+                            Response.ErrorListener errorListener,
+                            Map<String, String> stringParts, Map<String, File> fileParts) {
         super(Method.POST, url, errorListener);
-        //mistener = listener;
 
-        this.mMultipartEntityBuilder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-        this.mMultipartEntityBuilder.setCharset(Charset.defaultCharset());
-
-        if (requestStringBody != null) {
-            ContentType contentType = ContentType.create("text/plain", Consts.UTF_8);
-            for (LinkedHashMap.Entry<String, String> entry : requestStringBody.entrySet()) {
-                this.mMultipartEntityBuilder.addTextBody(entry.getKey(), entry.getValue(), contentType);
-            }
-        }
-
-        if (requestFileBody != null) {
-            for (LinkedHashMap.Entry<String, File> entry : requestFileBody.entrySet()) {
-                this.mMultipartEntityBuilder.addBinaryBody(entry.getKey(), entry.getValue());
-            }
-        }
+        mListener = listener;
+        mStringParts = stringParts;
+        mFileParts = fileParts;
+        buildMultipartEntity();
     }
+
+    private void buildMultipartEntity() {
+        entity.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+        //送信するリクエストを設定する
+        //StringData
+        for (Map.Entry<String, String> entry : mStringParts.entrySet()) {
+            entity.addTextBody(entry.getKey(), entry.getValue());
+
+        }
+        //File Data
+        for (Map.Entry<String, File> entry : mFileParts.entrySet()) {
+            entity.addPart(entry.getKey(), new FileBody(entry.getValue()));
+        }
+        httpEntitiy = entity.build();
+    }
+
+    public void setParams(MultipartEntityBuilder mEntity) {
+        entity = mEntity;
+        }
+
 
     @Override
     public String getBodyContentType() {
-        return this.mHttpEntity.getContentType().getValue();
+        return httpEntitiy.getContentType().getValue();
     }
 
+    public HttpEntity getEntity() {
+        return httpEntitiy;
+    }
+
+
     @Override
-    protected void deliverResponse(T response) {
-        //this.mVolleyResponseListener.onResponse(response);
+    protected Response<String> parseNetworkResponse(NetworkResponse response) {
+        return Response.success("Uploaded", getCacheEntry());
+
+    }
+
+    //リスナーにレスポンスを返す
+    @Override
+    protected void deliverResponse(String response) {
+        mListener.onResponse(response);
     }
 
     @Override
     public byte[] getBody() throws AuthFailureError {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-        this.mHttpEntity = this.mMultipartEntityBuilder.build();
-
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
-            this.mHttpEntity.writeTo(byteArrayOutputStream);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return byteArrayOutputStream.toByteArray();
+            httpEntitiy.writeTo(bos);
+            } catch (IOException e) {
+            Log.e("ERROR", e.getMessage());
+            }
+        return bos.toByteArray();
     }
 
 }
+
 
 
