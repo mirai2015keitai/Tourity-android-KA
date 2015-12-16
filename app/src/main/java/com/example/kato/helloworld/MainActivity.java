@@ -1,8 +1,10 @@
 package com.example.kato.helloworld;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
@@ -21,20 +23,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.android.volley.NetworkResponse;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.Volley;
+
+import org.apache.http.entity.mime.MultipartEntity;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends Activity implements LocationListener {
 
@@ -57,6 +60,8 @@ public class MainActivity extends Activity implements LocationListener {
     private String message;
     private Uri resultUri;
 
+    MultipartEntity mEntity;
+
 
     //private RequestQueue mQueue;
 
@@ -65,7 +70,7 @@ public class MainActivity extends Activity implements LocationListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setViews();
-        setPOST();
+        //setPOST();
 
 //緯度経度取得の準備
 //--------------------------------------------------------------------------------------------------
@@ -169,57 +174,57 @@ public class MainActivity extends Activity implements LocationListener {
 //投稿ボタン
 //--------------------------------------------------------------------------------------------------
 
-//    public void alertDialogShow(View v) {
-//
-//        //AlertDialog.Builderクラスのインスタンスを生成
-//
-//        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-//
-//        //タイトルを設定
-//        alertDialogBuilder.setTitle("エラー")
-//
-//                //メッセージを設定
-//                .setMessage("テキストが未入力です")
-//
-//                        //アイコンを設定
-//                        //.setIcon(R.drawable.ic_launcher)
-//
-//                        //Positiveボタン、リスナーを設定
-//                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        //OKボタンが押されたときの処理
-//                        //varTextView.setText("OKボタンがクリックされました");
-//                    }
-//                });
-//
-//        //投稿文が空 -> ダイアログ表示
-//        if (message == null || message.length() == 0) {
-//            //ダイアログを表示
-//            alertDialogBuilder.show();
-//        }
-//
-//        //投稿文あり -> サーバへ送信
-//        else {
-//            Toast.makeText(getApplicationContext(), "POST完了", Toast.LENGTH_LONG).show();
-//            Post();
-//        }
-//    }
+    public void alertDialogShow(View v) {
 
-    private void setPOST() {
-        Button button = (Button) findViewById(R.id.button2);
-        button.setOnClickListener(button2_onClick);
+        //AlertDialog.Builderクラスのインスタンスを生成
 
-    }
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
-    private View.OnClickListener button2_onClick = new View.OnClickListener() {
+        //タイトルを設定
+        alertDialogBuilder.setTitle("エラー")
 
-        @Override
-        public void onClick(View v) {
+                //メッセージを設定
+                .setMessage("テキストが未入力です")
 
-            Post();
+                        //アイコンを設定
+                        //.setIcon(R.drawable.ic_launcher)
+
+                        //Positiveボタン、リスナーを設定
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        //OKボタンが押されたときの処理
+                        //varTextView.setText("OKボタンがクリックされました");
+                    }
+                });
+
+        //投稿文が空 -> ダイアログ表示
+        if (message == null || message.length() == 0) {
+            //ダイアログを表示
+            alertDialogBuilder.show();
         }
 
-    };
+        //投稿文あり -> サーバへ送信
+        else {
+            Post();
+            Toast.makeText(getApplicationContext(), "POST完了", Toast.LENGTH_LONG).show();
+        }
+    }
+
+//    private void setPOST() {
+//        Button button = (Button) findViewById(R.id.button2);
+//        button.setOnClickListener(button2_onClick);
+//
+//    }
+//
+//    private View.OnClickListener button2_onClick = new View.OnClickListener() {
+//
+//        @Override
+//        public void onClick(View v) {
+//
+//            Post();
+//        }
+//
+//    };
 
 //緯度経度取得
 //--------------------------------------------------------------------------------------------------
@@ -292,109 +297,47 @@ public class MainActivity extends Activity implements LocationListener {
 //サーバとの通信
 //--------------------------------------------------------------------------------------------------
 
-//    private void Post(){
-//
-////        RequestQueue mQueue = Volley.newRequestQueue(getApplicationContext());
-//
-//
-//        String url = "http://192.168.33.10:1337/postMessage";
-////        String url = "http://tourityplus-android.ddns.net:1337/postMessage";
-//
-//        Map<String,String> stringMap = new HashMap<String, String>();
-//        Map<String,File> fileMap = new HashMap<String, File>();
-//
-//        //送るデータを設定
-//        //stringMap.put("text", "hogege"); //textも送るとき利用
-//        //fileMap.put("img", new File("/file/hoge.jpg"));
-//        stringMap.put("user_id", "1");     //仮ユーザID
-//        stringMap.put("message", message);       //メッセージ
-//        fileMap.put("image_path", new File(resultUri.getPath()));    //画像パス
-//        stringMap.put("latitude", String.valueOf(latitude));      //緯度
-//        stringMap.put("longitude", String.valueOf(longitude));     //経度
-//
-//        //user_id中身確認用
-//        Log.d("stringMap",stringMap.get("user_id"));
-//        Log.d("stringMap",stringMap.get("message"));
-//
-//        MultipartRequest multipartRequest = new MultipartRequest(
-//                url,
-//                new Response.Listener<String>() {
-//                    @Override
-//                    public void onResponse(String response) {
-//                        //Upload成功
-//                        Log.d("レスポンス", response);//ここのString型のresponseにサーバからのレスポンスが入る
-//                    }
-//                },
-//                new Response.ErrorListener() {
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                        //Upload失敗
-//                        Log.d("エラーレスポンス", "error1");
-//                    }
-//                },
-//                stringMap,
-//                fileMap);
-//
-//        //Log.d("",MultipartRequest.getentity());
-//
-//        RequestQueue mQueue = Volley.newRequestQueue(this.getApplicationContext());
-//        mQueue.add(multipartRequest);
-//        //mQueue.start();
-//
-//    }
-
-//サーバとの通信2
-//--------------------------------------------------------------------------------------------------
-
-    private void Post() {
-        Response.Listener<String> listener = new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                // リクエスト成功時
-                Log.d("レスポンス", response);//ここのString型のresponseにサーバからのレスポンスが入る
-            }
-        };
-
-        Response.ErrorListener errorListener = new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                // リクエスト失敗時
-                Log.d("エラーレスポンス", "error1");
-            }
-        };
+    private void Post(){
 
         String url = "http://192.168.33.10:1337/postMessage";
 //        String url = "http://tourityplus-android.ddns.net:1337/postMessage";
 
-        LinkedHashMap<String,String> stringMap = new LinkedHashMap<String, String>();
-        LinkedHashMap<String,File> fileMap = new LinkedHashMap<String, File>();
+        Map<String,String> stringMap = new HashMap<String, String>();
+        Map<String,File> fileMap = new HashMap<String, File>();
 
         //送るデータを設定
-        //stringMap.put("text", "hogege"); //textも送るとき利用
-        //fileMap.put("img", new File("/file/hoge.jpg"));
         stringMap.put("user_id", "1");     //仮ユーザID
         stringMap.put("message", message);       //メッセージ
-        fileMap.put("image_path", new File(resultUri.getPath()));    //画像パス
+        fileMap.put("image_path", new File("/storage/emulated/0/Download/MU.jpg"));    //画像パス
         stringMap.put("latitude", String.valueOf(latitude));      //緯度
         stringMap.put("longitude", String.valueOf(longitude));     //経度
 
-        MultipartRequest<String> multipartRequest = new MultipartRequest<String>(url, stringMap, fileMap, listener, errorListener) {
-            @Override
-            protected Response<String> parseNetworkResponse(NetworkResponse response) {
-                String parsed;
-                try {
-                    parsed = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
-                } catch (UnsupportedEncodingException e) {
-                    parsed = new String(response.data);
-                }
-                return Response.success(parsed, HttpHeaderParser.parseCacheHeaders(response));
-            }
-        };
+        //user_id中身確認用
+        Log.d("stringMap",stringMap.get("user_id"));
+        Log.d("stringMap",stringMap.get("message"));
 
-        RequestQueue requestQueue = Volley.newRequestQueue(this.getApplicationContext());
-        requestQueue.add(multipartRequest);
-        requestQueue.start();
+        MultipartRequest multipartRequest = new MultipartRequest(
+                url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        //Upload成功
+                        Log.d("レスポンス", response);//ここのString型のresponseにサーバからのレスポンスが入る
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //Upload失敗
+                        //Log.d("エラーレスポンス", "error1");
+                        Log.d("エラーレスポンス", error.getMessage());
+                    }
+                },
+                stringMap,
+                fileMap);
 
+        RequestQueue mQueue = Volley.newRequestQueue(this.getApplicationContext());
+        mQueue.add(multipartRequest);
     }
 
 }
