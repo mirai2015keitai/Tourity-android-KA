@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -14,6 +15,7 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -30,11 +32,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 
-import org.apache.http.entity.mime.MultipartEntity;
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,14 +40,9 @@ import java.util.Map;
 public class MainActivity extends Activity implements LocationListener {
 
     //ギャラリーのみのプログラム
-    //private static final int RESULT_PICK_IMAGEFILE = 1001;
-
-    //ギャラリーのみのプログラム
     private ImageView imageView;
     private Button button2;
     InputStream is = null;
-
-    //private Button button;
 
     //カメラ、ギャラリー
     private Uri m_uri;
@@ -60,17 +53,14 @@ public class MainActivity extends Activity implements LocationListener {
     private String message;
     private Uri resultUri;
 
-    MultipartEntity mEntity;
+    File file;
 
-
-    //private RequestQueue mQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setViews();
-        //setPOST();
 
 //緯度経度取得の準備
 //--------------------------------------------------------------------------------------------------
@@ -91,9 +81,6 @@ public class MainActivity extends Activity implements LocationListener {
         // ロケーションプロバイダの取得
         String provider = mLocationManager.getBestProvider(criteria, true);
 
-        // 取得したロケーションプロバイダを表示
-        //TextView tv_provider = (TextView) findViewById(R.id.Provider);
-        //tv_provider.setText("Provider: "+provider);
 
         // LocationListenerを登録
         mLocationManager.requestLocationUpdates(provider, 0, 0, this);
@@ -184,7 +171,7 @@ public class MainActivity extends Activity implements LocationListener {
         alertDialogBuilder.setTitle("エラー")
 
                 //メッセージを設定
-                .setMessage("テキストが未入力です")
+                .setMessage("テキストまたは画像を入力してください")
 
                         //アイコンを設定
                         //.setIcon(R.drawable.ic_launcher)
@@ -209,22 +196,6 @@ public class MainActivity extends Activity implements LocationListener {
             Toast.makeText(getApplicationContext(), "POST完了", Toast.LENGTH_LONG).show();
         }
     }
-
-//    private void setPOST() {
-//        Button button = (Button) findViewById(R.id.button2);
-//        button.setOnClickListener(button2_onClick);
-//
-//    }
-//
-//    private View.OnClickListener button2_onClick = new View.OnClickListener() {
-//
-//        @Override
-//        public void onClick(View v) {
-//
-//            Post();
-//        }
-//
-//    };
 
 //緯度経度取得
 //--------------------------------------------------------------------------------------------------
@@ -284,14 +255,20 @@ public class MainActivity extends Activity implements LocationListener {
             // 画像を設定
             imageView = (ImageView) findViewById(R.id.image_view);
             imageView.setImageURI(resultUri);
-            //uri→→inputstream サーバのプログラムで使用
-            try {
-                is = new FileInputStream(new File(resultUri.getPath()));
-            } catch (IOException e) {
+
+//送信のためのファイルに画像をセット
+//--------------------------------------------------------------------------------------------------
+
+            String id = DocumentsContract.getDocumentId(data.getData());
+            String selection = "_id=?";
+            String[] selectionArgs = new String[]{id.split(":")[1]};
+            Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String[]{MediaStore.MediaColumns.DATA}, selection, selectionArgs, null);
+
+            if (cursor.moveToFirst()) {
+                file = new File(cursor.getString(0));
             }
-
+            cursor.close();
         }
-
     }
 
 //サーバとの通信
@@ -308,13 +285,9 @@ public class MainActivity extends Activity implements LocationListener {
         //送るデータを設定
         stringMap.put("user_id", "1");     //仮ユーザID
         stringMap.put("message", message);       //メッセージ
-        fileMap.put("image_path", new File("/storage/emulated/0/Download/MU.jpg"));    //画像パス
+        fileMap.put("image_path", file);    //画像パス
         stringMap.put("latitude", String.valueOf(latitude));      //緯度
         stringMap.put("longitude", String.valueOf(longitude));     //経度
-
-        //user_id中身確認用
-        Log.d("stringMap",stringMap.get("user_id"));
-        Log.d("stringMap",stringMap.get("message"));
 
         MultipartRequest multipartRequest = new MultipartRequest(
                 url,
@@ -329,7 +302,6 @@ public class MainActivity extends Activity implements LocationListener {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         //Upload失敗
-                        //Log.d("エラーレスポンス", "error1");
                         Log.d("エラーレスポンス", error.getMessage());
                     }
                 },
